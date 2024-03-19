@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler;
 import com.baomidou.mybatisplus.core.toolkit.MybatisBatchUtils;
 import com.baomidou.mybatisplus.test.h2.entity.H2User;
+import com.baomidou.mybatisplus.test.h2.entity.SuperEntity;
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;
 import com.baomidou.mybatisplus.test.h2.mapper.H2UserMapper;
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -40,6 +41,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -81,7 +83,11 @@ class MybatisTest {
             Assertions.assertEquals(mapper.selectCount(new QueryWrapper<H2User>().lambda().eq(H2User::getName, "test")), 2);
             Assertions.assertEquals(mapper.delete(new QueryWrapper<H2User>().lambda().eq(H2User::getName, "test")), 2);
             H2User h2User = new H2User(66L, "66666", AgeEnum.THREE, 666);
+            H2User h2UserOne = new H2User(67L, "66666", AgeEnum.THREE, 666);
+            H2User h2UserTwo = new H2User(68L, "66666", AgeEnum.THREE, 666);
             Assertions.assertEquals(mapper.insert(h2User), 1);
+            Assertions.assertEquals(mapper.insert(h2UserOne), 1);
+            Assertions.assertEquals(mapper.insert(h2UserTwo), 1);
             h2User.setName("7777777777");
             H2User user = mapper.selectById(66L);
             Assertions.assertNotNull(user);
@@ -89,7 +95,16 @@ class MybatisTest {
             Assertions.assertNotNull(user.getTestType());
             Assertions.assertEquals(mapper.updateById(new H2User(66L, "777777")), 1);
             Assertions.assertEquals(mapper.deleteById(66L), 1);
+            Assertions.assertEquals(mapper.selectCountLong(), 5);
+            Assertions.assertEquals(mapper.selectCount(new QueryWrapper<H2User>()), 2);
+            Long[] longArray = {67L};
+            List<Long> ids = Arrays.asList(longArray);
+            Assertions.assertEquals(mapper.deleteBatchIds(ids), 1);
+            Assertions.assertEquals(mapper.deleteById(68L), 1);
             Assertions.assertNull(mapper.selectById(66L));
+            Assertions.assertNull(mapper.selectById(67L));
+            Assertions.assertNull(mapper.selectById(68L));
+            Assertions.assertNotNull(mapper.selectTestCustomSqlSegment(new QueryWrapper<H2User>().lambda().eq(SuperEntity::getTestId, 67L)));
         }
     }
 

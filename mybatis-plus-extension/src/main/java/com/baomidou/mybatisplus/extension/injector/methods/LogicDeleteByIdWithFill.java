@@ -68,13 +68,13 @@ public class LogicDeleteByIdWithFill extends AbstractMethod {
                 .collect(toList());
             if (CollectionUtils.isNotEmpty(fieldInfos)) {
                 String sqlSet = "SET " + fieldInfos.stream().map(i -> i.getSqlSet(EMPTY)).collect(joining(EMPTY))
-                    + tableInfo.getLogicDeleteSql(false, false);
+                    + tableInfo.getLogicDeleteSql(false, false, true);
                 sql = String.format(sqlMethod.getSql(), tableInfo.getTableName(), sqlSet, tableInfo.getKeyColumn(),
-                    tableInfo.getKeyProperty(), tableInfo.getLogicDeleteSql(true, true));
+                    tableInfo.getKeyProperty(), tableInfo.getLogicDeleteSql(true, true, true));
             } else {
                 sql = String.format(sqlMethod.getSql(), tableInfo.getTableName(), sqlLogicSet(tableInfo),
                     tableInfo.getKeyColumn(), tableInfo.getKeyProperty(),
-                    tableInfo.getLogicDeleteSql(true, true));
+                    tableInfo.getLogicDeleteSql(true, true, true));
             }
         } else {
             sqlMethod = SqlMethod.DELETE_BY_ID;

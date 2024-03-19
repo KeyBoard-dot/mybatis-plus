@@ -15,13 +15,7 @@
  */
 package com.baomidou.mybatisplus.core.metadata;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.OrderBy;
-import com.baomidou.mybatisplus.annotation.SqlCondition;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.handlers.IJsonTypeHandler;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
@@ -135,6 +129,13 @@ public class TableFieldInfo implements Constants {
      * 逻辑未删除值
      */
     private String logicNotDeleteValue;
+    /**
+     * 逻辑删除类型
+     * DEFAULT mode   默认逻辑   设置value/delval
+     * ID      mode   注入当前ID
+     * */
+    @Getter
+    private LogicMode mode;
     /**
      * 字段 update set 部分注入
      */
@@ -408,6 +409,8 @@ public class TableFieldInfo implements Constants {
         /* 获取注解属性，逻辑处理字段 */
         TableLogic tableLogic = globalConfig.getAnnotationHandler().getAnnotation(field, TableLogic.class);
         if (null != tableLogic) {
+            //获取Mode value
+            mode = tableLogic.mode();
             if (StringUtils.isNotBlank(tableLogic.value())) {
                 this.logicNotDeleteValue = tableLogic.value();
             } else {

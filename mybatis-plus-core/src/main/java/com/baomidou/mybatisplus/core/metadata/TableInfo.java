@@ -17,6 +17,7 @@ package com.baomidou.mybatisplus.core.metadata;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.KeySequence;
+import com.baomidou.mybatisplus.annotation.LogicMode;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import lombok.AccessLevel;
@@ -444,6 +445,24 @@ public class TableInfo implements Constants {
         }
         return EMPTY;
     }
+    /**
+     * 获取逻辑删除字段的 sql 脚本
+     *
+     * @param startWithAnd      是否以 and 开头
+     * @param isWhere           是否需要的是逻辑删除值
+     * @param isDeleteMethod    是否是逻辑删除语句
+     * @return sql 脚本
+     */
+    public String getLogicDeleteSql(boolean startWithAnd, boolean isWhere, boolean isDeleteMethod) {
+        if (withLogicDelete) {
+            String logicDeleteSql = formatLogicDeleteSql(isWhere);
+            if (startWithAnd) {
+                logicDeleteSql = " AND " + logicDeleteSql;
+            }
+            return logicDeleteSql;
+        }
+        return EMPTY;
+    }
 
     /**
      * format logic delete SQL, can be overrided by subclass
@@ -467,6 +486,39 @@ public class TableInfo implements Constants {
         } else {
             return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", value);
         }
+    }
+    /**
+     * format logic delete SQL, can be overrided by subclass
+     * github #1386
+     *
+     * @param isWhere true: logicDeleteValue, false: logicNotDeleteValue
+     * @param isDeleteMethod DeletesSql
+     * @return sql
+     */
+    protected String formatLogicDeleteSql(boolean isWhere, boolean isDeleteMethod) {
+        if (isDeleteMethod == false) {
+            return formatLogicDeleteSql(isWhere);
+        }
+        LogicMode mode = logicDeleteFieldInfo.getMode();
+        final String value = isWhere ? logicDeleteFieldInfo.getLogicNotDeleteValue() : logicDeleteFieldInfo.getLogicDeleteValue();
+        if (isWhere) {
+            if (NULL.equalsIgnoreCase(value)) {
+                return logicDeleteFieldInfo.getColumn() + " IS NULL";
+            } else {
+                return logicDeleteFieldInfo.getColumn() + EQUALS + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", value);
+            }
+        }
+        final String targetStr = logicDeleteFieldInfo.getColumn() + EQUALS;
+        if (NULL.equalsIgnoreCase(value)) {
+            return targetStr + NULL;
+        }
+        if (mode == LogicMode.DEFAULT) {
+            return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", value);
+        } else if (mode == LogicMode.ID) {
+            return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'#{%s}'" : "#{%s}", keyProperty);
+        }
+        //mode没有匹配使用默认模式
+        return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", value);
     }
 
     /**

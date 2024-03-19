@@ -73,6 +73,6 @@ public class DeleteBatchByIds extends AbstractMethod {
                 SqlScriptUtils.convertChoose("@org.apache.ibatis.type.SimpleTypeRegistry@isSimpleType(item.getClass())",
                     "#{item}", "#{item." + tableInfo.getKeyProperty() + "}"),
                 COLL, null, "item", COMMA),
-            tableInfo.getLogicDeleteSql(true, true));
+            tableInfo.getLogicDeleteSql(true, true,true));
     }
 }

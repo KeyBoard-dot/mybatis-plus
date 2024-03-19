@@ -37,4 +37,9 @@ public @interface TableLogic {
      * 默认逻辑删除值（该值可无、会自动获取全局配置）
      */
     String delval() default "";
+
+    /**
+     * 逻辑模式（该值可无、默认DEFAULT模式）
+     * */
+    LogicMode mode() default LogicMode.DEFAULT;
 }

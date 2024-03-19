@@ -15,11 +15,7 @@
  */
 package com.baomidou.mybatisplus.test.h2.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.Version;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -72,7 +68,7 @@ public class H2User extends SuperEntity {
     @Version
     private Integer version;
 
-    @TableLogic
+    @TableLogic(mode = LogicMode.ID)
     private Integer deleted;
 
 
@@ -129,7 +125,8 @@ public class H2User extends SuperEntity {
             "testType=" + testType + "," +
             "desc=" + desc + "," +
             "testDate=" + testDate + "," +
-            "version=" + version;
+            "deleted =" + deleted + "," +
+            "version=" + version + "}";
     }
 
     public static H2User ofId(Long id) {

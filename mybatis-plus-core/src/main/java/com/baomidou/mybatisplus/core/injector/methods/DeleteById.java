@@ -62,13 +62,13 @@ public class DeleteById extends AbstractMethod {
             if (CollectionUtils.isNotEmpty(fieldInfos)) {
                 String sqlSet = "SET " + SqlScriptUtils.convertIf(fieldInfos.stream()
                     .map(i -> i.getSqlSet(EMPTY)).collect(joining(EMPTY)), "!@org.apache.ibatis.type.SimpleTypeRegistry@isSimpleType(_parameter.getClass())", true)
-                    + tableInfo.getLogicDeleteSql(false, false);
+                    + tableInfo.getLogicDeleteSql(false, false, true);
                 sql = String.format(sqlMethod.getSql(), tableInfo.getTableName(), sqlSet, tableInfo.getKeyColumn(),
-                    tableInfo.getKeyProperty(), tableInfo.getLogicDeleteSql(true, true));
+                    tableInfo.getKeyProperty(), tableInfo.getLogicDeleteSql(true, true, true));
             } else {
                 sql = String.format(sqlMethod.getSql(), tableInfo.getTableName(), sqlLogicSet(tableInfo),
                     tableInfo.getKeyColumn(), tableInfo.getKeyProperty(),
-                    tableInfo.getLogicDeleteSql(true, true));
+                    tableInfo.getLogicDeleteSql(true, true, true));
             }
             SqlSource sqlSource = super.createSqlSource(configuration, sql, Object.class);
             return addUpdateMappedStatement(mapperClass, modelClass, methodName, sqlSource);
