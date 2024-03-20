@@ -455,7 +455,7 @@ public class TableInfo implements Constants {
      */
     public String getLogicDeleteSql(boolean startWithAnd, boolean isWhere, boolean isDeleteMethod) {
         if (withLogicDelete) {
-            String logicDeleteSql = formatLogicDeleteSql(isWhere);
+            String logicDeleteSql = formatLogicDeleteSql(isWhere, isDeleteMethod);
             if (startWithAnd) {
                 logicDeleteSql = " AND " + logicDeleteSql;
             }
@@ -496,7 +496,7 @@ public class TableInfo implements Constants {
      * @return sql
      */
     protected String formatLogicDeleteSql(boolean isWhere, boolean isDeleteMethod) {
-        if (isDeleteMethod == false) {
+        if (!isDeleteMethod) {
             return formatLogicDeleteSql(isWhere);
         }
         LogicMode mode = logicDeleteFieldInfo.getMode();
@@ -515,7 +515,7 @@ public class TableInfo implements Constants {
         if (mode == LogicMode.DEFAULT) {
             return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", value);
         } else if (mode == LogicMode.ID) {
-            return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'#{%s}'" : "#{%s}", keyProperty);
+            return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", keyColumn);
         }
         //mode没有匹配使用默认模式
         return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", value);

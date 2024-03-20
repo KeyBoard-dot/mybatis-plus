@@ -15,107 +15,104 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * @author miemie
- * @since 2020-06-23
- */
-public class LogicDelTest extends BaseDbTest<EntityMapper> {
+public class StudentLogicDelTest extends BaseDbTest<StudentMapper> {
 
     @Test
-    void logicDel() {
+    void testLogicDel() {
+
         doTestAutoCommit(i -> {
             int delete = i.deleteById(1L);
             assertThat(delete).isEqualTo(1);
 
-            delete = i.delete(Wrappers.<Entity>lambdaQuery().eq(Entity::getId, 2));
+            delete = i.delete(Wrappers.<Student>lambdaQuery().eq(Student::getId, 2));
             assertThat(delete).isEqualTo(1);
         });
 
         doTest(i -> {
-            Entity entity = i.byId(1L);
+            Student entity = i.byId(1L);
             assertThat(entity).isNotNull();
-            assertThat(entity.getDeleted()).isTrue();
+            assertThat(Objects.equals(entity.getDeleted(), entity.getId()));
 
             entity = i.byId(2L);
             assertThat(entity).isNotNull();
-            assertThat(entity.getDeleted()).isTrue();
+            assertThat(Objects.equals(entity.getDeleted(), entity.getId()));
         });
 
         doTest(mapper -> {
-            Entity entity = new Entity();
-            entity.setName("测试根据实体删除");
-            mapper.insert(entity);
-            assertThat(mapper.deleteById(entity)).isEqualTo(1);
+            Student student = new Student();
+            student.setName("测试根据实体删除");
+            mapper.insert(student);
+            assertThat(mapper.deleteById(student)).isEqualTo(1);
         });
 
         doTest(mapper -> {
-            Entity entity1 = new Entity();
-            entity1.setName("测试根据实体主键批量删除");
-            mapper.insert(entity1);
-            Entity entity2 = new Entity();
-            entity2.setName("测试根据实体主键批量删除");
-            mapper.insert(entity2);
-            assertThat(mapper.deleteBatchIds(Arrays.asList(entity1.getId(), entity2.getId()))).isEqualTo(2);
+            Student student1 = new Student();
+            student1.setName("测试根据实体主键批量删除");
+            mapper.insert(student1);
+            Student student2 = new Student();
+            student2.setName("测试根据实体主键批量删除");
+            mapper.insert(student2);
+            assertThat(mapper.deleteBatchIds(Arrays.asList(student1.getId(), student2.getId()))).isEqualTo(2);
         });
 
         doTest(mapper -> {
-            Entity entity1 = new Entity();
+            Student entity1 = new Student();
             entity1.setName("测试根据实体批量删除");
             mapper.insert(entity1);
-            Entity entity2 = new Entity();
+            Student entity2 = new Student();
             entity2.setName("测试根据实体批量删除");
             mapper.insert(entity2);
-            List<Entity> entityList = new ArrayList<>();
+            List<Student> entityList = new ArrayList<>();
             entityList.add(entity1);
             entityList.add(entity2);
             assertThat(mapper.deleteBatchIds(entityList)).isEqualTo(2);
             entityList.forEach(entity -> {
-                Assertions.assertEquals("聂秋秋", entity.getDeleteBy());
+                Assertions.assertEquals("haitang", entity.getDeleteBy());
+                System.out.println(entity);
             });
         });
 
         doTest(mapper -> {
-            Entity entity1 = new Entity();
+            Student entity1 = new Student();
             entity1.setName("测试自定义方法根据实体批量删除");
             mapper.insert(entity1);
-            Entity entity2 = new Entity();
+            Student entity2 = new Student();
             entity2.setName("测试自定义方法根据实体批量删除");
             mapper.insert(entity2);
-            List<Entity> entityList = new ArrayList<>();
+            List<Student> entityList = new ArrayList<>();
             entityList.add(entity1);
             entityList.add(entity2);
             assertThat(mapper.testDeleteBatch(entityList)).isEqualTo(2);
             entityList.forEach(entity -> {
-                Assertions.assertEquals("聂秋秋", entity.getDeleteBy());
+                Assertions.assertEquals("haitang", entity.getDeleteBy());
             });
         });
 
         doTest(mapper -> {
-            List<Entity> entities = mapper.selectAllEntity();
-            entities.forEach(System.out::println);
+            List<Student> students = mapper.selectAllStudent();
+            students.forEach(System.out::println);
         });
-
     }
 
     @Override
     protected String tableDataSql() {
-        return "insert into entity(id,name) values(1,'1'),(2,'2');";
+        return "insert into student(id,name) values(1,'1'),(2,'2');";
     }
-
     @Override
     protected List<String> tableSql() {
-        return Arrays.asList("drop table if exists entity", "CREATE TABLE IF NOT EXISTS entity (" +
-            "id BIGINT NOT NULL," +
+        return Arrays.asList("drop table if exists student", "CREATE TABLE IF NOT EXISTS student(" +
+            "id BIGINT AUTO_INCREMENT NOT NULL," +
             "name VARCHAR(30) NULL DEFAULT NULL," +
             "delete_by VARCHAR(30) NULL DEFAULT NULL," +
-            "deleted BOOLEAN NOT NULL DEFAULT false," +
+            "deleted BIGINT NOT NULL DEFAULT 0," +
             "PRIMARY KEY (id))");
     }
 
-    @Override
+     @Override
     protected GlobalConfig globalConfig() {
         GlobalConfig globalConfig = super.globalConfig();
         globalConfig.setMetaObjectHandler(new MetaObjectHandler() {
@@ -127,7 +124,7 @@ public class LogicDelTest extends BaseDbTest<EntityMapper> {
 
             @Override
             public void updateFill(MetaObject metaObject) {
-                strictUpdateFill(metaObject, "deleteBy", String.class, "聂秋秋");
+                strictUpdateFill(metaObject, "deleteBy", String.class, "haitang");
             }
         });
         globalConfig.setSqlInjector(new DefaultSqlInjector() {
@@ -140,4 +137,5 @@ public class LogicDelTest extends BaseDbTest<EntityMapper> {
         });
         return globalConfig;
     }
+
 }

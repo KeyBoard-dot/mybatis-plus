@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler;
 import com.baomidou.mybatisplus.core.toolkit.MybatisBatchUtils;
 import com.baomidou.mybatisplus.test.h2.entity.H2User;
-import com.baomidou.mybatisplus.test.h2.entity.SuperEntity;
 import com.baomidou.mybatisplus.test.h2.enums.AgeEnum;
 import com.baomidou.mybatisplus.test.h2.mapper.H2UserMapper;
 import org.apache.ibatis.exceptions.PersistenceException;
@@ -43,7 +42,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-
 
 /**
  * 原生Mybatis测试
@@ -104,7 +102,7 @@ class MybatisTest {
             Assertions.assertNull(mapper.selectById(66L));
             Assertions.assertNull(mapper.selectById(67L));
             Assertions.assertNull(mapper.selectById(68L));
-            Assertions.assertNotNull(mapper.selectTestCustomSqlSegment(new QueryWrapper<H2User>().lambda().eq(SuperEntity::getTestId, 67L)));
+            Assertions.assertNotNull(mapper.selectTestCustomSqlSegment(new QueryWrapper<H2User>().lambda().eq(H2User::getTestId, 67L)));
         }
     }
 

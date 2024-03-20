@@ -18,5 +18,6 @@ public interface EntityMapper extends BaseMapper<Entity> {
 
     int testDeleteBatch(@Param(Constants.COLL) List<Entity> entityList);
 
-
+    @Select("select * from entity")
+    List<Entity> selectAllEntity();
 }

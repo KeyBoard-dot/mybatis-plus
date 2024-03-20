@@ -104,9 +104,8 @@ public abstract class AbstractMethod implements Constants {
      * @return sql set 片段
      */
     protected String sqlLogicSet(TableInfo table) {
-        return "SET " + table.getLogicDeleteSql(false, false);
+        return "SET " + table.getLogicDeleteSql(false, false, true);
     }
-
     /**
      * SQL 更新 set 语句
      *
