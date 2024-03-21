@@ -450,12 +450,12 @@ public class TableInfo implements Constants {
      *
      * @param startWithAnd      是否以 and 开头
      * @param isWhere           是否需要的是逻辑删除值
-     * @param isDeleteMethod    是否是逻辑删除语句
+     * @param isDelByIdMethod   是否是逻辑ById删除语句
      * @return sql 脚本
      */
-    public String getLogicDeleteSql(boolean startWithAnd, boolean isWhere, boolean isDeleteMethod) {
+    public String getLogicDeleteSql(boolean startWithAnd, boolean isWhere, boolean isDelByIdMethod) {
         if (withLogicDelete) {
-            String logicDeleteSql = formatLogicDeleteSql(isWhere, isDeleteMethod);
+            String logicDeleteSql = formatLogicDeleteSql(isWhere, isDelByIdMethod);
             if (startWithAnd) {
                 logicDeleteSql = " AND " + logicDeleteSql;
             }
@@ -492,11 +492,11 @@ public class TableInfo implements Constants {
      * github #1386
      *
      * @param isWhere true: logicDeleteValue, false: logicNotDeleteValue
-     * @param isDeleteMethod DeletesSql
+     * @param isDelByIdMethod true: use id mode, false: use default mode
      * @return sql
      */
-    protected String formatLogicDeleteSql(boolean isWhere, boolean isDeleteMethod) {
-        if (!isDeleteMethod) {
+    protected String formatLogicDeleteSql(boolean isWhere, boolean isDelByIdMethod) {
+        if (!isDelByIdMethod) {
             return formatLogicDeleteSql(isWhere);
         }
         LogicMode mode = logicDeleteFieldInfo.getMode();
@@ -504,7 +504,7 @@ public class TableInfo implements Constants {
         if (isWhere) {
             if (NULL.equalsIgnoreCase(value)) {
                 return logicDeleteFieldInfo.getColumn() + " IS NULL";
-            } else {
+            }else {
                 return logicDeleteFieldInfo.getColumn() + EQUALS + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", value);
             }
         }
@@ -512,9 +512,7 @@ public class TableInfo implements Constants {
         if (NULL.equalsIgnoreCase(value)) {
             return targetStr + NULL;
         }
-        if (mode == LogicMode.DEFAULT) {
-            return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", value);
-        } else if (mode == LogicMode.ID) {
+        if (LogicMode.ID == mode) {
             return targetStr + String.format(logicDeleteFieldInfo.isCharSequence() ? "'%s'" : "%s", keyColumn);
         }
         //mode没有匹配使用默认模式
